@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud de Crédito — Abonos del Pacífico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1a3a2a;
+    --green-mid:  #2d6a4f;
+    --green-light:#52b788;
+    --green-pale: #d8f3dc;
+    --cream:      #f8f4ec;
+    --cream-dark: #ede8dc;
+    --gold:       #c9973a;
+    --gold-light: #f0d9a8;
+    --text:       #1c2b20;
+    --text-mid:   #4a5e50;
+    --text-light: #7a9180;
+    --red:        #c0392b;
+    --white:      #ffffff;
+    --radius:     12px;
+    --shadow:     0 4px 24px rgba(26,58,42,0.10);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+  .hero { background: var(--green-dark); position: relative; overflow: hidden; padding: 52px 0 44px; text-align: center; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(82,183,136,0.18) 0%, transparent 70%), radial-gradient(ellipse 40% 80% at 20% 80%, rgba(201,151,58,0.12) 0%, transparent 60%); }
+  .hero-logo { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 20px; position: relative; }
+  .hero-logo-icon { width: 48px; height: 48px; background: var(--gold); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .hero-logo-text { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 600; color: var(--white); letter-spacing: -0.01em; line-height: 1.2; }
+  .hero-logo-sub { font-family: 'DM Sans', sans-serif; font-size: 0.72rem; color: var(--green-light); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400; display: block; }
+  .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(1.9rem, 5vw, 2.8rem); font-weight: 600; color: var(--white); position: relative; letter-spacing: -0.02em; line-height: 1.1; }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero p { color: rgba(255,255,255,0.65); font-size: 0.92rem; margin-top: 10px; position: relative; }
+  .hero-badge { display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 100px; padding: 4px 14px; font-size: 0.75rem; color: var(--green-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; position: relative; }
+
+  .progress-wrap { background: var(--green-dark); padding: 0 0 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+  .progress-steps { display: flex; justify-content: center; gap: 0; max-width: 640px; margin: 0 auto; padding: 0 20px; }
+  .step-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; position: relative; }
+  .step-item:not(:last-child)::after { content: ''; position: absolute; top: 18px; left: calc(50% + 18px); right: calc(-50% + 18px); height: 2px; background: rgba(255,255,255,0.15); transition: background 0.3s; }
+  .step-item.done:not(:last-child)::after { background: var(--green-light); }
+  .step-dot { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 500; transition: all 0.3s; font-family: 'DM Sans', sans-serif; }
+  .step-item.active .step-dot { background: var(--gold); border-color: var(--gold); color: var(--white); box-shadow: 0 0 0 4px rgba(201,151,58,0.25); }
+  .step-item.done .step-dot { background: var(--green-light); border-color: var(--green-light); color: var(--white); }
+  .step-label { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-align: center; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.2; }
+  .step-item.active .step-label { color: var(--gold); }
+  .step-item.done .step-label { color: var(--green-light); }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+  .section-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 28px; overflow: hidden; display: none; animation: fadeUp 0.4s ease; }
+  .section-card.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .section-head { background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%); padding: 22px 28px; display: flex; align-items: center; gap: 16px; }
+  .section-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .section-head h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; color: var(--white); letter-spacing: -0.01em; }
+  .section-head p { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .section-body { padding: 28px; }
+
+  .field-grid { display: grid; gap: 20px; }
+  .col-2 { grid-template-columns: 1fr 1fr; }
+  .col-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .col-full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.82rem; font-weight: 500; color: var(--text-mid); letter-spacing: 0.01em; }
+  .required-star { color: var(--gold); margin-left: 3px; }
+  input[type=text], input[type=email], input[type=tel], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--cream-dark); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--text); background: var(--cream);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; outline: none; appearance: none; -webkit-appearance: none;
+  }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5e50' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+  input:focus, select:focus, textarea:focus { border-color: var(--green-mid); background: var(--white); box-shadow: 0 0 0 3px rgba(45,106,79,0.12); }
+  input.error, select.error, textarea.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+  .field-error { font-size: 0.75rem; color: var(--red); display: none; }
+  .field-error.visible { display: block; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .repeat-wrap { display: flex; flex-direction: column; gap: 16px; }
+  .repeat-item { background: var(--cream); border: 1.5px solid var(--cream-dark); border-radius: 10px; padding: 20px; position: relative; animation: fadeUp 0.3s ease; }
+  .repeat-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .repeat-item-label { font-family: 'Fraunces', serif; font-size: 0.95rem; font-weight: 600; color: var(--green-dark); }
+  .btn-remove { background: none; border: 1.5px solid #e0d5d5; color: #c0392b; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .btn-remove:hover { background: #fdf0ef; border-color: #c0392b; }
+  .btn-add { display: flex; align-items: center; gap: 8px; background: none; border: 2px dashed var(--green-light); color: var(--green-mid); border-radius: 10px; padding: 12px 20px; font-size: 0.88rem; font-weight: 500; cursor: pointer; width: 100%; justify-content: center; transition: all 0.2s; font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+  .btn-add:hover { background: var(--green-pale); border-color: var(--green-mid); }
+  .btn-add span { font-size: 1.1rem; }
+
+  .divider { height: 1px; background: var(--cream-dark); margin: 24px 0; }
+  .auth-box { background: var(--cream); border-left: 4px solid var(--green-mid); border-radius: 0 10px 10px 0; padding: 18px 20px; font-size: 0.82rem; color: var(--text-mid); line-height: 1.7; margin-bottom: 24px; }
+  .checkbox-row { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin-bottom: 12px; }
+  .checkbox-row input[type=checkbox] { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--green-mid); margin-top: 2px; cursor: pointer; }
+  .checkbox-row label { font-size: 0.88rem; color: var(--text); font-weight: 400; cursor: pointer; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
+  .btn-nav { display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn-prev { background: var(--white); color: var(--text-mid); border: 1.5px solid var(--cream-dark); }
+  .btn-prev:hover { background: var(--cream); }
+  .btn-next { background: var(--green-mid); color: var(--white); box-shadow: 0 4px 14px rgba(45,106,79,0.3); }
+  .btn-next:hover { background: var(--green-dark); box-shadow: 0 6px 20px rgba(45,106,79,0.4); transform: translateY(-1px); }
+  .btn-submit { background: var(--gold); color: var(--white); box-shadow: 0 4px 14px rgba(201,151,58,0.35); font-size: 1rem; padding: 14px 36px; }
+  .btn-submit:hover { background: #b5832e; transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* Spinner overlay */
+  .spinner-overlay { display: none; position: fixed; inset: 0; background: rgba(26,58,42,0.55); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
+  .spinner-overlay.active { display: flex; }
+  .spinner { width: 52px; height: 52px; border: 4px solid rgba(255,255,255,0.25); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-text { color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; }
+
+  .success-screen { display: none; text-align: center; padding: 60px 20px; animation: fadeUp 0.5s ease; }
+  .success-screen.active { display: block; }
+  .success-icon { width: 80px; height: 80px; background: var(--green-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 24px; }
+  .success-screen h2 { font-family: 'Fraunces', serif; font-size: 2rem; color: var(--green-dark); margin-bottom: 12px; }
+  .success-screen p { color: var(--text-mid); font-size: 0.95rem; max-width: 440px; margin: 0 auto 28px; }
+  .data-summary { background: var(--white); border-radius: var(--radius); padding: 24px; text-align: left; max-width: 520px; margin: 0 auto; box-shadow: var(--shadow); font-size: 0.85rem; }
+  .data-summary h3 { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--green-dark); margin-bottom: 14px; border-bottom: 1px solid var(--cream-dark); padding-bottom: 10px; }
+  .sum-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--cream-dark); }
+  .sum-row:last-child { border: none; }
+  .sum-key { color: var(--text-light); }
+  .sum-val { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; }
+  .hint { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+  .note-banner { background: var(--gold-light); border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #6b4c10; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 20px; }
+
+  /* Error banner for submit failures */
+  .error-banner { background: #fdf0ef; border: 1.5px solid var(--red); border-radius: 10px; padding: 14px 18px; color: var(--red); font-size: 0.88rem; margin-top: 16px; display: none; }
+  .error-banner.visible { display: block; }
+
+  @media (max-width: 600px) { .col-2, .col-3 { grid-template-columns: 1fr; } .section-body { padding: 20px 16px; } .btn-nav { padding: 12px 18px; font-size: 0.85rem; } }
+</style>
+</head>
+<body>
+
+<!-- SPINNER -->
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+  <div class="spinner-text">Enviando solicitud...</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-logo">
+    <div class="hero-logo-icon">🌿</div>
+    <div class="hero-logo-text">Abonos del Pacífico<span class="hero-logo-sub">S.A. — Crédito Comercial</span></div>
+  </div>
+  <div class="hero-badge">Solicitud en línea</div>
+  <h1>Solicitud de <em>Crédito</em></h1>
+  <p>Complete el formulario en 4 sencillos pasos · Tiempo estimado: 5 minutos</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step-item active" data-step="0"><div class="step-dot">1</div><div class="step-label">Info<br>General</div></div>
+    <div class="step-item" data-step="1"><div class="step-dot">2</div><div class="step-label">Puntos de<br>Entrega</div></div>
+    <div class="step-item" data-step="2"><div class="step-dot">3</div><div class="step-label">Personal<br>Autorizado</div></div>
+    <div class="step-item" data-step="3"><div class="step-dot">4</div><div class="step-label">Autorización<br>y Firma</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- STEP 1 -->
+  <div class="section-card active" id="step-0">
+    <div class="section-head"><div class="section-icon">👤</div><div><h2>Información del Solicitante</h2><p>Datos generales del cliente que solicita el crédito</p></div></div>
+    <div class="section-body">
+      <div class="field-grid col-2">
+        <div class="field col-full"><label>Nombre Completo / Razón Social <span class="required-star">★</span></label><input type="text" id="nombre" placeholder="Ej: Juan Carlos Pérez Rodríguez" required><div class="field-error" id="err-nombre">Este campo es obligatorio</div></div>
+        <div class="field"><label>N° Identificación (Cédula / RUC) <span class="required-star">★</span></label><input type="text" id="cedula" placeholder="Ej: 8-123-4567" required><div class="field-error" id="err-cedula">Este campo es obligatorio</div></div>
+        <div class="field"><label>Tipo de Persona <span class="required-star">★</span></label><select id="tipo-persona" required><option value="">Seleccione...</option><option>Persona Natural</option><option>Persona Jurídica</option></select><div class="field-error" id="err-tipo-persona">Seleccione una opción</div></div>
+        <div class="field"><label>Actividad Principal <span class="required-star">★</span></label><select id="actividad" required><option value="">Seleccione...</option></select><div class="field-error" id="err-actividad">Seleccione una opción</div></div>
+        <div class="field"><label>Cultivo / Sub-Ramo</label><select id="subramo"><option value="">Seleccione...</option></select></div>
+        <div class="field"><label>Estado Civil</label><select id="estado-civil"><option value="">Seleccione...</option><option>Soltero/a</option><option>Casado/a</option><option>Unión Libre</option><option>Divorciado/a</option><option>Viudo/a</option></select></div>
+        <div class="field"><label>Profesión u Oficio</label><input type="text" id="profesion" placeholder="Ej: Agricultor"></div>
+        <div class="field"><label>Tipo de Cliente</label><select id="tipo-cliente"><option value="">Seleccione...</option></select></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-family:'Fraunces',serif;font-size:1rem;color:var(--green-dark);margin-bottom:16px;font-weight:600;">Contacto</p>
+      <div class="field-grid col-2">
+        <div class="field"><label>Teléfono Principal <span class="required-star">★</span></label><input type="tel" id="telefono" placeholder="+507 6000-0000" required><div class="field-error" id="err-telefono">Este campo es obligatorio</div></div>
+        <div class="field"><label>Celular / WhatsApp</label><input type="tel" id="celular" placeholder="+507 6000-0000"></div>
+        <div class="field col-full"><label>Correo Electrónico <span class="required-star">★</span></label><input type="email" id="email" placeholder="correo@ejemplo.com" required><div class="field-error" id="err-email">Ingrese un correo válido</div></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-family:'Fraunces',serif;font-size:1rem;color:var(--green-dark);margin-bottom:16px;font-weight:600;">Dirección Principal</p>
+      <div class="field-grid col-3">
+        <div class="field"><label>Provincia <span class="required-star">★</span></label><select id="provincia-1" required onchange="onProvChange(this,'distrito-1','correg-1')"><option value="">Seleccione...</option></select><div class="field-error" id="err-provincia-1">Seleccione una provincia</div></div>
+        <div class="field"><label>Distrito <span class="required-star">★</span></label><select id="distrito-1" required onchange="onDistChange(this,'correg-1')"><option value="">Primero seleccione provincia</option></select><div class="field-error" id="err-distrito-1">Seleccione un distrito</div></div>
+        <div class="field"><label>Corregimiento</label><select id="correg-1"><option value="">Primero seleccione distrito</option></select></div>
+        <div class="field col-full"><label>Dirección Detallada <span class="required-star">★</span></label><textarea id="direccion-1" placeholder="Ej: Finca Los Mangos, km 5 carretera a Chitré..." required></textarea><div class="field-error" id="err-direccion-1">Ingrese la dirección detallada</div></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-family:'Fraunces',serif;font-size:1rem;color:var(--green-dark);margin-bottom:16px;font-weight:600;">Detalles del Crédito</p>
+      <div class="field-grid col-2">
+        <div class="field"><label>Monto Solicitado (USD) <span class="required-star">★</span></label><input type="number" id="monto" placeholder="0.00" min="0" required><div class="field-error" id="err-monto">Ingrese el monto solicitado</div></div>
+        <div class="field"><label>Plazo Solicitado <span class="required-star">★</span></label><select id="plazo" required><option value="">Seleccione...</option><option>30 días</option><option>60 días</option><option>90 días</option><option>120 días</option><option>180 días</option></select><div class="field-error" id="err-plazo">Seleccione el plazo</div></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-family:'Fraunces',serif;font-size:1rem;color:var(--green-dark);margin-bottom:4px;font-weight:600;">Encargado de Pagos (1.3)</p>
+      <p class="hint" style="margin-bottom:16px;">Persona responsable de gestionar los pagos del crédito</p>
+      <div class="field-grid col-2">
+        <div class="field col-full"><label>Nombre Completo <span class="required-star">★</span></label><input type="text" id="pagos-nombre" placeholder="Nombre completo del encargado" required><div class="field-error" id="err-pagos-nombre">Este campo es obligatorio</div></div>
+        <div class="field"><label>N° Identificación <span class="required-star">★</span></label><input type="text" id="pagos-cedula" placeholder="Cédula o RUC" required><div class="field-error" id="err-pagos-cedula">Este campo es obligatorio</div></div>
+        <div class="field"><label>Teléfono <span class="required-star">★</span></label><input type="tel" id="pagos-tel" placeholder="+507 6000-0000" required><div class="field-error" id="err-pagos-tel">Este campo es obligatorio</div></div>
+        <div class="field"><label>Celular / WhatsApp</label><input type="tel" id="pagos-cel" placeholder="+507 6000-0000"></div>
+        <div class="field"><label>Correo Electrónico <span class="required-star">★</span></label><input type="email" id="pagos-email" placeholder="correo@ejemplo.com" required><div class="field-error" id="err-pagos-email">Ingrese un correo válido</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section-card" id="step-1">
+    <div class="section-head"><div class="section-icon">📍</div><div><h2>Puntos de Entrega Autorizados</h2><p>Sección 1.4 — Lugares donde se entregarán los productos</p></div></div>
+    <div class="section-body">
+      <div class="note-banner"><span>ℹ️</span><span>Agregue todos los puntos donde desea recibir mercancía. Puede registrar múltiples puntos.</span></div>
+      <div class="repeat-wrap" id="puntos-container"></div>
+      <button class="btn-add" onclick="addPunto()"><span>+</span> Agregar Punto de Entrega</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section-card" id="step-2">
+    <div class="section-head"><div class="section-icon">👥</div><div><h2>Personal Autorizado</h2><p>Sección 2.0 — Personas que pueden realizar trámites</p></div></div>
+    <div class="section-body">
+      <div class="note-banner"><span>📎</span><span><strong>Importante:</strong> Adjunte fotocopia de cédula vigente (ambos lados) de cada persona autorizada.</span></div>
+      <div class="repeat-wrap" id="personal-container"></div>
+      <button class="btn-add" onclick="addPersonal()"><span>+</span> Agregar Persona Autorizada</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section-card" id="step-3">
+    <div class="section-head"><div class="section-icon">✍️</div><div><h2>Autorización y Firma</h2><p>Sección 3 — Declaración jurada del solicitante</p></div></div>
+    <div class="section-body">
+      <div class="auth-box">Yo, el solicitante, declaro bajo la gravedad del juramento: a) que la información aquí proporcionada es correcta y verdadera; b) que ha sido otorgada con el único propósito de calificar para la apertura de una línea de crédito para la adquisición de productos y servicios ofrecidos por <strong>Abonos del Pacífico S.A.</strong>; c) que no existe proceso judicial, penal, civil o administrativo promovido en mi contra. Abonos del Pacífico S.A. queda autorizado para confirmar la información declarada y solicitar información adicional. Me obligo a notificar cualquier cambio que afecte mi condición como cliente.</div>
+      <div class="field-grid col-2" style="margin-bottom:24px;">
+        <div class="field"><label>Ciudad de Firma <span class="required-star">★</span></label><input type="text" id="ciudad-firma" placeholder="Ej: David, Chiriquí" required><div class="field-error" id="err-ciudad-firma">Ingrese la ciudad</div></div>
+        <div class="field"><label>Fecha <span class="required-star">★</span></label><input type="date" id="fecha-firma" required><div class="field-error" id="err-fecha-firma">Seleccione la fecha</div></div>
+      </div>
+      <div class="checkbox-row"><input type="checkbox" id="acepto-1"><label for="acepto-1">He leído y acepto la declaración anterior. Confirmo que toda la información proporcionada es verídica.</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="acepto-2"><label for="acepto-2">Autorizo a Abonos del Pacífico S.A. a verificar la información y consultar referencias comerciales.</label></div>
+      <div class="field-error" id="err-acepto" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <div class="nav-row" id="nav-row">
+    <button class="btn-nav btn-prev" id="btn-prev" onclick="prevStep()" style="visibility:hidden">← Anterior</button>
+    <button class="btn-nav btn-next" id="btn-next" onclick="nextStep()">Siguiente →</button>
+  </div>
+  <div class="error-banner" id="submit-error">⚠️ Hubo un problema al enviar la solicitud. Por favor intente de nuevo o contáctenos directamente.</div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✅</div>
+    <h2>¡Solicitud Enviada!</h2>
+    <p>Su solicitud de crédito ha sido recibida. Un ejecutivo de <strong>Abonos del Pacífico S.A.</strong> se pondrá en contacto a la brevedad.</p>
+    <div class="data-summary" id="data-summary"></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIGURATION — replace this URL after deploying Apps Script
+// ════════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1vZSQGA1YXgDDAo49S3up9_dzHbUJtMYhZixzeTnF2HNYDwMlUKWhQJIXa5wjBxEb/exec';
+
+const CATALOG = {"tramites": ["RETIRAR MERCANCÍA", "RECIBIR MERCANCÍA EN PUNTO DE ENTREGA", "REALIZAR PEDIDO"], "provincias": ["BOCAS DEL TORO", "CHIRIQUI", "COCLE", "COLON", "COMARCA EMBERA-WOUNAAN", "COMARCA KUNA YALA", "COMARCA NGÄBE-BUGLÉ", "DARIEN", "HERRERA", "LOS SANTOS", "PANAMA", "PANAMA OESTE", "VERAGUAS"], "ramos": ["AGRÍCOLA", "GANADERO", "PESQUERO", "MINERO", "INDUSTRIA", "CONSTRUCCIÓN", "ENERGÍA", "TRANSPORTE", "COMUNICACIONES", "COMERCIO", "TURISMO", "SANIDAD", "EDUACIÓN", "FINANZAS", "GOBIERNO", "OTROS"], "sub_ramos": ["AGUACATE", "AJONJOLÍ", "ALGODÓN", "ARROZ", "ARVEJA", "AVENA", "BANANO", "CAFÉ", "CALABAZA", "AZÚCAR", "CEBADA", "AJO", "CHILE", "CÍTRICOS", "ESPÁRRAGO", "FRIJOL", "SECOS", "GARBANZO", "HULE", "MAÍZ", "MANGO", "CACAHUATE", "MANZANA", "MELÓN", "OLEAGINOSAS", "ORNAMENTALES", "FRUTAS", "HORTALIZAS", "AFRICANA", "PAPA", "PAPAYA", "PASTOS", "PIÑA", "SANDÍA", "SOYA", "TABACO", "TOMATE", "TRIGO", "VID", "AGRÍCOLA", "PALMITO", "PEJIBAYE", "YUCA", "PLÁTANO", "SORGO", "BOVINO", "CAPRINO", "EQUINO", "OVINO", "PORCINO", "GANADERO", "MOLUSCOS", "PECES", "MARINA", "PESQUERO", "MINERALES", "BEBIDAS", "CONSUMO", "INDUSTRIALES", "FARMACÉUTICOS", "EQUIPO", "CALZADO", "INDUSTRIA", "INFRAESTRUCTURA", "INMUEBLES", "CONSTRUCCIÓN", "ENERGÍA", "AÉREO", "MARÍTIMO", "TERRESTRE", "TRANSPORTE", "TELECOMUNICACIONES", "AGROSERVICIOS", "MINORISTAS", "MAYORISTAS", "COMERCIOS", "FIDELIZADO", "TURISMO", "SANIDAD", "EDUCACIÓN", "ASEGURADORAS", "FINANCIERAS", "FINANZAS", "ESTADOS", "MINISTERIOS", "MUNICIPALES", "GOBIERNOS", "OTROS"], "tipos_cli": ["VD VENTA DIRECTA", "DI DISTRIBUCIÓN"], "geo": {"BOCAS DEL TORO": {"BOCAS DEL TORO": ["BASTIMENTOS", "BOCAS DEL TORO (CABE", "CAUCHERO", "PUNTA LAUREL", "TIERRA OSCURA"], "CHANGUINOLA": ["ALMIRANTE", "CHANGUINOLA (CABECERA)", "EL EMPALME", "GUABITO", "LAS TABLAS", "TERIBE", "VALLE DEL RISCO"], "CHIRIQUI GRANDE": ["CHIRIQUI GRANDE (CA", "MIRAMAR", "PUNTA PEÑA", "PUNTA ROBALO", "RAMBALA"]}, "CHIRIQUI": {"ALANJE": ["ALANJE (CABECERA)", "CANTA GALLO", "DIVALA", "EL TEJAR", "GUARUMAL", "NUEVO MEXICO", "PALO GRANDE", "QUEREVALO", "SANTO TOMAS"], "BARU": ["BACO", "LIMONES", "PROGRESO", "PUERTO ARMUELLES (CABECERA)", "RODOLFO AGUILAR DELGADO"], "BOQUERON": ["BAGALA", "BOQUERON (CABECERA)", "CORDILLERA", "GUABAL", "GUAYABAL", "PARAISO", "PEDREGAL", "TIJERAS"], "BOQUETE": ["ALTO BOQUETE", "BAJO BOQUETE (CABECERA)", "CALDERA", "JARAMILLO", "LOS NARANJOS", "PALMIRA"], "BUGABA": ["ASERRIO DE GARICHE", "BUGABA", "CERRO PUNTA  (Inválido)", "EL BONGO", "GOMEZ", "LA CONCEPCION (CABECERA)", "LA ESTRELLA", "SAN ANDRES", "SANTA MARTA", "SANTA ROSA", "SANTO DOMINGO", "SORTOVA", "VOLCAN (Inválido)"], "DAVID": ["BIJAGUAL", "CHIRIQUI", "COCHEA", "DAVID (CABECERA)", "GUACA", "LAS LOMAS", "PEDREGAL", "SAN CARLOS", "SAN PABLO NUEVO", "SAN PABLO VIEJO"], "DOLEGA": ["DOLEGA (CABECERA)", "DOS RIOS", "LOS ALGARRROBOS", "LOS ANASTACIOS", "POTRERILLOS", "POTRERILLOS ABAJO", "ROVIRA", "TINAJAS"], "GUALACA": ["GUALACA (CABECERA)", "HORNITO", "LOS ANGELES", "PAJA DE SOMBRERO", "RINCON"], "REMEDIOS": ["EL NANCITO", "EL PORVENIR", "EL PUERTO", "REMEDIOS (CABECERA)", "SANTA LUCIA"], "RENACIMIENTO": ["BREÑON", "CAÑAS GORDAS", "DOMINICAL", "MONTE LIRIO", "PLAZA CAISAN", "RIO SERENO (CABECERA)", "SANTA CLARA", "SANTA CRUZ"], "SAN FELIX": ["JUAY", "LAJAS ADENTRO", "LAS LAJAS (CABECERA)", "SAN FELIX", "SANTA CRUZ"], "SAN LORENZO": ["BOCA CHICA", "BOCA DEL MONTE", "HORCONCITOS (CABECERA)", "SAN JUAN", "SAN LORENZO"], "TIERRAS ALTAS": ["CERRO PUNTA", "CUESTA DE PIEDRA", "NUEVA CALIFORNIA", "PASO ANCHO", "VOLCAN"], "TOLE": ["BELLA VISTA", "CERRO VIEJO", "EL CRISTO", "JUSTO FIDEL PALACIOS", "LAJAS DE TOLE", "POTRERO DE CAÑA", "QUEBRADA DE PIEDRA", "TOLE (CABECERA)", "VELADERO"]}, "COCLE": {"AGUADULCE": ["AGUADULCE (CABECERA)", "BARRIOS UNIDOS", "EL CRISTO", "EL ROBLE", "POCRI"], "ANTON": ["ANTON (CABECERA)", "CABALLERO", "CABUYA", "EL CHIRU", "EL RETIRO", "EL VALLE", "JUAN DIAZ", "RIO HATO", "SAN JUAN DE DIOS", "SANTA RITA"], "LA PINTADA": ["EL HARINO", "EL POTRERO", "LA PINTADA (CABECERA)", "LAS LOMAS", "LLANO GRANDE", "PIEDRAS GORDAS"], "NATA": ["CAPELLANIA", "EL CAÑO", "GUZMAN", "LAS HUACAS", "NATA (CABECERA)", "TOZA"], "OLA": ["EL COPE", "EL PALMAR", "EL PICACHO", "LA PAVA", "OLA (CABECERA)"], "PENONOME": ["CAÑAVERAL", "CHIGUIRI ARRIBA", "COCLE", "EL COCO", "PAJONAL", "PENONOME (CABECERA)", "RIO GRANDE", "RIO INDIO", "TOABRE", "TULU"]}, "COLON": {"CHAGRES": ["ACHIOTE", "EL GUABO", "LA ENCANTADA", "NUEVO CHAGRES (CABECERA)", "PALMAS BELLAS", "PIÑA", "SALUD"], "COLON": ["6", "BARRIO SUR", "BUENA VISTA", "CATIVA", "CIRICITO", "CRISTOBAL", "ESCOBAL", "LIMON", "NUEVA PROVIDENCIA", "PUERTO PILON", "SABANITAS", "SALAMANCA", "SAN JUAN", "SANTA ROSA"], "DONOSO": ["COCLE DEL NORTE", "EL GUASIMO", "GOBEA", "MIGUEL DE LA BORDA (CABECERA)", "RIO INDIO", "SAN JOSE DEL GENERAL"], "PORTOBELO": ["CACIQUE", "GARROTE", "ISLA GRANDE", "MARIA CHIQUITA", "PORTOBELO (CABECERA)"], "SANTA ISABEL": ["CUANGO", "MIRAMAR", "NOMBRE DE DIOS", "PALENQUE (CABECERA)", "PALMIRA", "PLAYA CHIQUITA", "SANTA ISABEL", "VIENTO FRIO"]}, "COMARCA EMBERA-WOUNAAN": {"CEMACO": ["CIRILO GUAINORA (CAB", "LAJAS BLANCAS", "MANUEL ORTEGA"], "SAMBU": ["RIO SABALO", "JINGURUDO"]}, "COMARCA KUNA YALA": {"COMARCA KUNA YALA": ["AILIGANDI", "NARGANA (CABEC", "PUERTO OBALDIA", "TUBUALA"]}, "COMARCA NGÄBE-BUGLÉ": {"BESIKO": ["SOLOY (CABECERA)", "BOCA DE BALSA", "CAMARON ARRIBA", "CERRO BANCO", "CERRO DE PATENA", "EMPLANADA DE CHORCHA", "NAMNONI", "NIBA"], "KANKINTU": ["BISIRA (CABECERA)", "BURI", "GUARIVIARA", "GUORONI", "KANKINTU", "MUNUNI", "PIEDRA ROJA", "TUWAI", "MAN CREEK"], "KUSAPIN": ["KUSAPIN (CABECERA)", "BAHIA AZUL", "CALOVEBORA O SANTA CAT", "LOMA YUCA", "RIO CHIRIQUI", "TOBOBE", "VALLE BONITO"], "MIRONO": ["HATO PILON (CABECERA)", "CASCABEL", "HATO COROTU", "HATO CULANTRO", "HATO JOBO", "HATO JULI", "QUEBRADA DE LORO", "SALTO DUPI"], "MUNA": ["CHICHICA (CABECERA)", "ROKA", "SITIO PRADO", "UMANI", "ALTO CABALLERO", "BAKAMA", "CERRO CAÑA", "CERRO PUERCO", "KRUA", "MARACA", "NIBRA", "PEÑA BLANCA"], "NOLE DUIMA": ["CERRO IGLESIAS (CAB", "HATO CHAMI", "JADEBERI", "LAJERO", "SUSAMA"], "NURUM": ["BUENOS AIRES (CABECERA)", "AGUA DE SALUD", "ALTO DE JESUS", "CERRO PELADO", "EL BALE", "EL PAREDON", "EL PIRO", "GUAYABITO", "GUIBALE"]}, "DARIEN": {"CHEPIGANA": ["AGUA FRIA INACTIVO", "CAMOGANTI", "CHEPIGANA", "CUCUNATI INACTIVO", "GARACHINE", "JAQUE", "LA PALMA (CABECERA)", "PUERTO PIÑA", "RIO CONGO ARRIBA INACTIVO", "RIO CONGO INACTIVO", "RIO IGLESIAS INACTIVO", "SAMBU", "SANTA FE INACTIVO", "SETEGANTI", "TAIMATI", "TUCUTI"], "PINOGANA": ["BOCA DE CUPE", "COMARCA KUNA DE WARGANDI", "EL REAL DE SANTA MARIA (CABECE", "METETI", "PAYA", "PINOGANA", "PUCURO", "YAPE", "YAVIZA"], "SANTA FE": ["AGUA FRIA", "CUCUNATI", "RIO CONGO", "RIO CONGO ARRIBA", "RIO IGLESIAS", "SANTA FE", "ZAPALLAL"]}, "HERRERA": {"CHITRE": ["CHITRE (CABECERA)", "LA ARENA", "LLANO BONITO", "MONAGRILLO", "SAN JUAN BAUTISTA"], "LAS MINAS": ["CHEPO", "CHUMICAL", "EL TORO", "LAS MINAS (CABECERA)", "LEONES", "QUEBRADA DEL ROSARIO", "QUEBRADA EL CIPRIAN"], "LOS POZOS": ["CAPURI", "EL CALABACITO", "EL CEDRO", "LA ARENA", "LA PITALOSA", "LAS LLANAS", "LOS CERRITOS", "LOS CERROS DE PAJA", "LOS POZOS (CABECERA)"], "OCU": ["CERRO LARGO", "EL TIJERA", "LLANO GRANDE", "LOS LLANOS", "MENCHACA", "OCU (CABECERA)", "PEÑAS CHATAS"], "PARITA": ["CABUYA", "LLANO DE LA CRUZ", "LOS CASTILLOS", "PARIS", "PARITA (CABECERA)", "PORTOBELILLO", "POTUGA"], "PESE": ["EL BARRERO", "EL CIRUELO", "EL PAJARO", "EL PEDREGOSO", "LAS CABRAS", "PESE (CABECERA)", "RINCON HONDO", "SABANAGRANDE"], "SANTA MARIA": ["CHUPAMPA", "EL LIMON", "EL RINCON", "LOS CANELOS", "SANTA MARIA (CABECERA)"]}, "LOS SANTOS": {"GUARARE": ["EL ESPINAL", "EL HATO", "EL MACANO", "GUARARE (CABECERA)", "GUARARE ARRIBA", "LA ENEA", "LA PASERA", "LAS TRANCAS", "LLANO ABAJO", "PERALES"], "LAS TABLAS": ["BAJO CORRAL", "BAYANO", "EL CARATE", "EL COCAL", "EL MANANTIAL", "EL MUÑOZ", "EL PEDREGOSO", "LA LAJA", "LA MIEL", "LA PALMA", "LA TIZA", "LAS PALMITAS", "LAS TABLAS (CABECERA)", "LAS TABLAS ABAJO", "NUARIO", "PALMIRA", "PEÑA BLANCA", "RIO HONDO", "SAN JOSE", "SAN MIGUEL", "SANTO DOMINGO", "SESTEADERO", "VALLE RICO", "VALLERIQUITO"], "LOS SANTOS": ["AGUA BUENA", "EL GUASIMO", "LA COLORADA", "LA ESPIGADILLA", "LA VILLA DE LOS SANTOS (CABE", "LAS CRUCES", "LAS GUABAS", "LLANO LARGO", "LOS ANGELES", "LOS OLIVOS", "SABANAGRANDE", "SANTA ANA", "TRES QUEBRADAS", "VILLA LOURDES"], "MACARACAS": ["BAHIA HONDA", "BAJOS DE GUERA", "CHUPA", "COROZAL", "EL CEDRO", "ESPINO AMARILLO", "LA MESA", "LAS PALMAS", "LLANO DE PIEDRA", "MACARACAS (CABECERA)", "MOGOLLON"], "PEDASI": ["LOS ASIENTOS", "MARIABE", "ORIA ARRIBA", "PEDASI (CABECERA)", "PURIO"], "POCRI": ["EL CAÑAFISTULO", "LAJAMINA", "PARAISO", "PARITILLA", "POCRI"], "TONOSI": ["ALTOS DE GUERA", "CAMBUTAL", "CAÑAS", "EL BEBEDERO", "EL CACAO", "EL CORTEZO", "FLORES", "GUANICO", "ISLA DE CAQAS", "LA TRONOSA", "TONOSI (CABECERA)"]}, "PANAMA": {"BALBOA": ["LA ENSENADA", "LA ESMERALDA", "LA GUINEA", "PEDRO GONZALEZ", "SABOGA", "SAN MIGUEL (CABECERA)"], "CHEPO": ["CAÑITA", "CHEPILLO", "CHEPO (CABECERA)", "COMARCA KUNA DE MADUNGANDI", "EL LLANO", "LAS MARGARITAS", "SANTA CRUZ DE CHININA", "TORTI"], "CHIMAN": ["BRUJAS", "CHIMAN (CABECERA)", "GONZALO VASQUEZ", "PASIGA", "UNION SANTEÑA"], "PANAMA": ["24 DE DICIEMBRE", "ALCALDE DIAZ", "ANCON", "BELLA VISTA", "BETANIA", "CAIMITILLO", "CHILIBRE", "CURUNDU", "DON BOSCO", "EL CHORRILLO", "ERNESTO CORDOBA CAMPOS", "JUAN DIAZ", "LA EXPOSICION O CALIDONIA", "LAS CUMBRES", "LAS GARZAS", "LAS MAQANITAS", "PACORA", "PARQUE LEFEVRE", "PEDREGAL", "PUEBLO NUEVO", "RIO ABAJO", "SAN FELIPE", "SAN FRANCISCO", "SAN MARTIN", "SANTA ANA", "TOCUMEN"], "SAN MIGUELITO": ["AMELIA DENIS DE ICAZA", "ARNULFO ARIAS", "BELISARIO FRIAS", "BELISARIO PORRAS", "JOSE DOMINGO ESPINAR", "MATEO ITURRALDE", "OMAR TORRIJOS", "RUFINA ALFARO", "VICTORIANO LORENZO"], "TABOGA": ["OTOQUE OCCIDENTE", "OTOQUE ORIENTE", "TABOGA (CABECERA)"]}, "PANAMA OESTE": {"ARRAIJAN": ["ARRAIJAN (CABECERA)", "BURUNGA", "CERRO SILVESTRE", "JUAN DEMOSTENES AROSEMENA", "NUEVO EMPERADOR", "SANTA CLARA", "VERACRUZ", "VISTA ALEGRE"], "CAPIRA": ["CAIMITO", "CAMPANA", "CAPIRA (CABECERA)", "CERMEÑO", "CIRI DE LOS SOTOS", "CIRI GRANDE", "EL CACAO", "LA TRINIDAD", "LAS OLLAS ARRIBA", "LIDICE", "SANTA ROSA", "VILLA CARMEN", "VILLA ROSARIO"], "CHAME": ["BEJUCO", "BUENOS AIRES", "CABUYA", "CHAME (CABECERA)", "CHICA", "EL LIBANO", "LAS LAJAS", "NUEVA GORGONA", "PUNTA CHAME", "SAJALICES", "SORA"], "LA CHORRERA": ["AMADOR", "AROSEMENA", "BARRIO BALBOA", "BARRIO COLON", "EL ARADO", "EL COCO", "FEUILLET", "GUADALUPE", "HERRERA", "HURTADO", "ITURRALDE", "LA REPRESA", "LOS DIAZ", "MENDOZA", "OBALDIA", "PLAYA LEONA", "PUERTO CAIMITO", "SANTA RITA"], "SAN CARLOS": ["EL ESPINO", "EL HIGO", "GUAYABITO", "LA ERMITA", "LA LAGUNA", "LAS UVAS", "LOS LLANITOS", "SAN CARLOS (CABECERA)", "SAN JOSE"]}, "VERAGUAS": {"ATALAYA": ["ATALAYA (CABECERA)", "EL BARRITO", "LA CARRILLO", "LA MONTAÑUELA", "SAN ANTONIO"], "CALOBRE": ["BARNIZAL", "CALOBRE (CABECERA)", "CHITRA", "EL COCLA", "EL POTRERO", "LA LAGUNA", "LA RAYA DE CALOBRE", "LA TETILLA", "LA YEGUADA", "LAS GUIAS", "MONJARAS", "SAN JOSE"], "CAÑAZAS": ["CAÑAZAS (CABECERA)", "CERRO PLATA", "EL AROMILLO", "EL PICADOR", "LOS VALLES", "SAN JOSE", "SAN MARCELO"], "LA MEZA": ["BISVALLES", "BORO", "LA MESA (CABECERA)", "LLANO GRANDE", "LOS MILAGROS", "SAN BARTOLO"], "LAS PALMAS": ["CERRO DE CASA", "COROZAL", "EL MARIA", "EL PRADO", "EL RINCON", "LAS PALMAS (CABECERA)", "LOLA", "PIXVAE", "PUERTO VIDAL", "SAN MARTIN DE PORRES", "VIGUI", "ZAPOTILLO"], "MARIATO": ["ARENAS", "EL CACAO", "LLANO DE CATIVAL O MARIATO (CABEC", "QUEBRO", "TEBARIO"], "MONTIJO": ["ARENAS", "CEBACO", "COSTA HERMOSA", "EL PILON", "GOBERNADORA", "LA GARCEANA", "LEONES", "MONTIJO (CABECERA)", "TEBARIO", "UNION DEL NORTE"], "RIO DE JESUS": ["CATORCE DE NOVIEMBRE", "LAS HUACAS", "LOS CASTILLOS", "RIO DE JESUS (CABECERA)", "UTIRA"], "SAN FRANCISCO": ["CORRAL FALSO", "LOS HATILLOS", "REMANCE", "SAN FRANCISCO (CABECERA)", "SAN JOSE", "SAN JUAN"], "SANTA FE": ["CALOVEBORA", "EL ALTO", "EL CUAY", "EL PANTANO", "GATU O GATUCITO", "RIO LUIS", "SANTA FE (CABECERA)"], "SANTIAGO": ["CANTO DEL LLANO", "CARLOS SANTANA AVILA", "EDWIN FABREGA", "LA COLORADA", "LA PEÑA", "LA RAYA DE SANTA MARIA", "LOS ALGARROBOS", "PONUGA", "SAN MARTIN DE PORRES", "SAN PEDRO DEL ESPINO", "SANTIAGO (CABECERA)", "URRACA"], "SONA": ["BAHIA HONDA", "CALIDONIA", "CATIVE", "EL MARAÑON", "GUARUMAL", "LA SOLEDAD", "QUEBRADA DE ORO", "RIO GRANDE", "RODEO VIEJO", "SONA (CABECERA)"]}}};
+
+let currentStep = 0;
+const totalSteps = 4;
+
+// ── INIT ─────────────────────────────────────────────────────────
+function populateSelect(id, arr) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Seleccione...</option>';
+  arr.forEach(v => { const o = document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+}
+
+function init() {
+  populateSelect('actividad', CATALOG.ramos);
+  populateSelect('subramo', CATALOG.sub_ramos);
+  populateSelect('tipo-cliente', CATALOG.tipos_cli);
+  CATALOG.provincias.forEach(p => {
+    const sel = document.getElementById('provincia-1');
+    const o = document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o);
+  });
+  document.getElementById('fecha-firma').valueAsDate = new Date();
+  addPunto();
+  addPersonal();
+}
+
+function onProvChange(sel, distId, corregId) {
+  const prov = sel.value;
+  const distSel = document.getElementById(distId);
+  const corSel  = document.getElementById(corregId);
+  distSel.innerHTML = '<option value="">Seleccione distrito...</option>';
+  corSel.innerHTML  = '<option value="">Seleccione corregimiento...</option>';
+  if (!prov || !CATALOG.geo[prov]) return;
+  Object.keys(CATALOG.geo[prov]).forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; distSel.appendChild(o); });
+}
+function onDistChange(sel, corregId) {
+  const provSel = sel.closest('.field-grid')?.querySelector('select[id^="provincia"]') || document.getElementById('provincia-1');
+  const prov = provSel?.value;
+  const dist = sel.value;
+  const corSel = document.getElementById(corregId);
+  corSel.innerHTML = '<option value="">Seleccione corregimiento...</option>';
+  if (!dist||!prov||!CATALOG.geo[prov]||!CATALOG.geo[prov][dist]) return;
+  CATALOG.geo[prov][dist].forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; corSel.appendChild(o); });
+}
+
+// ── PUNTOS ───────────────────────────────────────────────────────
+let puntoCount = 0;
+function addPunto() {
+  puntoCount++;
+  const idx = puntoCount;
+  const div = document.createElement('div');
+  div.className = 'repeat-item'; div.id = `punto-${idx}`;
+  div.innerHTML = `
+    <div class="repeat-item-header">
+      <span class="repeat-item-label">📍 Punto de Entrega #${idx}</span>
+      ${idx>1?`<button class="btn-remove" onclick="removePunto(${idx})">✕ Eliminar</button>`:''}
+    </div>
+    <div class="field-grid col-2">
+      <div class="field col-full"><label>Nombre / Alias del Punto</label><input type="text" id="punto-${idx}-alias" placeholder="Ej: Finca Principal, Bodega Norte..."></div>
+      <div class="field"><label>Provincia <span class="required-star">★</span></label>
+        <select id="punto-${idx}-prov" onchange="onPuntoProvChange(${idx})">
+          <option value="">Seleccione...</option>${CATALOG.provincias.map(p=>`<option>${p}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>Distrito <span class="required-star">★</span></label><select id="punto-${idx}-dist" onchange="onPuntoDistChange(${idx})"><option value="">Primero seleccione provincia</option></select></div>
+      <div class="field"><label>Corregimiento</label><select id="punto-${idx}-correg"><option value="">Primero seleccione distrito</option></select></div>
+      <div class="field col-full"><label>Dirección Detallada <span class="required-star">★</span></label><textarea id="punto-${idx}-dir" placeholder="Cómo llegar al punto de entrega..." style="min-height:65px;"></textarea></div>
+      <div class="field"><label>Encargado de Recibir <span class="required-star">★</span></label><input type="text" id="punto-${idx}-encargado" placeholder="Nombre del encargado"></div>
+      <div class="field"><label>N° Cédula del Encargado</label><input type="text" id="punto-${idx}-cedula" placeholder="Cédula o identificación"></div>
+    </div>`;
+  document.getElementById('puntos-container').appendChild(div);
+}
+function removePunto(idx) { document.getElementById(`punto-${idx}`).remove(); }
+function onPuntoProvChange(idx) {
+  const prov = document.getElementById(`punto-${idx}-prov`).value;
+  const distSel = document.getElementById(`punto-${idx}-dist`);
+  const corSel  = document.getElementById(`punto-${idx}-correg`);
+  distSel.innerHTML = '<option value="">Seleccione distrito...</option>';
+  corSel.innerHTML  = '<option value="">Seleccione corregimiento...</option>';
+  if (!prov||!CATALOG.geo[prov]) return;
+  Object.keys(CATALOG.geo[prov]).forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; distSel.appendChild(o); });
+}
+function onPuntoDistChange(idx) {
+  const prov = document.getElementById(`punto-${idx}-prov`).value;
+  const dist = document.getElementById(`punto-${idx}-dist`).value;
+  const corSel = document.getElementById(`punto-${idx}-correg`);
+  corSel.innerHTML = '<option value="">Seleccione corregimiento...</option>';
+  if (!dist||!prov||!CATALOG.geo[prov]||!CATALOG.geo[prov][dist]) return;
+  CATALOG.geo[prov][dist].forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; corSel.appendChild(o); });
+}
+
+// ── PERSONAL ─────────────────────────────────────────────────────
+let persCount = 0;
+function addPersonal() {
+  persCount++;
+  const idx = persCount;
+  const div = document.createElement('div');
+  div.className = 'repeat-item'; div.id = `pers-${idx}`;
+  div.innerHTML = `
+    <div class="repeat-item-header">
+      <span class="repeat-item-label">👤 Persona Autorizada #${idx}</span>
+      ${idx>1?`<button class="btn-remove" onclick="removePersonal(${idx})">✕ Eliminar</button>`:''}
+    </div>
+    <div class="field-grid col-2">
+      <div class="field col-full"><label>Nombre Completo <span class="required-star">★</span></label><input type="text" id="pers-${idx}-nombre" placeholder="Nombre y apellidos"></div>
+      <div class="field"><label>N° de Cédula <span class="required-star">★</span></label><input type="text" id="pers-${idx}-cedula" placeholder="Cédula o RUC"></div>
+      <div class="field"><label>Celular / WhatsApp <span class="required-star">★</span></label><input type="tel" id="pers-${idx}-cel" placeholder="+507 6000-0000"></div>
+      <div class="field col-full"><label>Correo de Contacto <span class="required-star">★</span></label><input type="email" id="pers-${idx}-email" placeholder="correo@ejemplo.com"></div>
+      <div class="field col-full"><label>Trámite Autorizado <span class="required-star">★</span></label>
+        <select id="pers-${idx}-tramite">
+          <option value="">Seleccione el trámite...</option>${CATALOG.tramites.map(t=>`<option>${t}</option>`).join('')}
+        </select></div>
+    </div>`;
+  document.getElementById('personal-container').appendChild(div);
+}
+function removePersonal(idx) { document.getElementById(`pers-${idx}`).remove(); }
+
+// ── VALIDATION ────────────────────────────────────────────────────
+function showErr(id, hasError) {
+  const el  = document.getElementById(`err-${id}`);
+  const inp = document.getElementById(id);
+  if (el)  el.classList.toggle('visible', hasError);
+  if (inp) inp.classList.toggle('error', hasError);
+  return !hasError;
+}
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function validateStep(step) {
+  let ok = true;
+  if (step === 0) {
+    ok &= showErr('nombre',       !v('nombre'));
+    ok &= showErr('cedula',       !v('cedula'));
+    ok &= showErr('tipo-persona', !v('tipo-persona'));
+    ok &= showErr('actividad',    !v('actividad'));
+    ok &= showErr('telefono',     !v('telefono'));
+    ok &= showErr('email',        !v('email') || !v('email').includes('@'));
+    ok &= showErr('provincia-1',  !v('provincia-1'));
+    ok &= showErr('distrito-1',   !v('distrito-1'));
+    ok &= showErr('direccion-1',  !v('direccion-1'));
+    ok &= showErr('monto',        !v('monto'));
+    ok &= showErr('plazo',        !v('plazo'));
+    ok &= showErr('pagos-nombre', !v('pagos-nombre'));
+    ok &= showErr('pagos-cedula', !v('pagos-cedula'));
+    ok &= showErr('pagos-tel',    !v('pagos-tel'));
+    ok &= showErr('pagos-email',  !v('pagos-email') || !v('pagos-email').includes('@'));
+  }
+  if (step === 3) {
+    ok &= showErr('ciudad-firma', !v('ciudad-firma'));
+    ok &= showErr('fecha-firma',  !v('fecha-firma'));
+    const a1 = document.getElementById('acepto-1').checked;
+    const a2 = document.getElementById('acepto-2').checked;
+    const errA = document.getElementById('err-acepto');
+    if (!a1||!a2) { errA.textContent='Debe aceptar ambas declaraciones para continuar.'; errA.classList.add('visible'); ok=false; }
+    else errA.classList.remove('visible');
+  }
+  return !!ok;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+function updateNav() {
+  document.getElementById('btn-prev').style.visibility = currentStep===0?'hidden':'visible';
+  const btn = document.getElementById('btn-next');
+  if (currentStep===totalSteps-1) { btn.textContent='Enviar Solicitud ✓'; btn.className='btn-nav btn-submit'; }
+  else { btn.innerHTML='Siguiente →'; btn.className='btn-nav btn-next'; }
+  document.querySelectorAll('.step-item').forEach((el,i) => {
+    el.classList.remove('active','done');
+    if (i===currentStep) el.classList.add('active');
+    else if (i<currentStep) el.classList.add('done');
+  });
+}
+function nextStep() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep===totalSteps-1) { submitForm(); return; }
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep++;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateNav();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function prevStep() {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep--;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateNav();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── COLLECT DATA ──────────────────────────────────────────────────
+function collectData() {
+  // Puntos
+  const puntos = [];
+  document.querySelectorAll('[id^="punto-"][id$="-alias"]').forEach(el => {
+    const idx = el.id.split('-')[1];
+    puntos.push({
+      alias:     document.getElementById(`punto-${idx}-alias`)?.value||'',
+      provincia: document.getElementById(`punto-${idx}-prov`)?.value||'',
+      distrito:  document.getElementById(`punto-${idx}-dist`)?.value||'',
+      correg:    document.getElementById(`punto-${idx}-correg`)?.value||'',
+      direccion: document.getElementById(`punto-${idx}-dir`)?.value||'',
+      encargado: document.getElementById(`punto-${idx}-encargado`)?.value||'',
+      cedula:    document.getElementById(`punto-${idx}-cedula`)?.value||'',
+    });
+  });
+  // Personal
+  const personal = [];
+  document.querySelectorAll('[id^="pers-"][id$="-nombre"]').forEach(el => {
+    const idx = el.id.split('-')[1];
+    personal.push({
+      nombre:   document.getElementById(`pers-${idx}-nombre`)?.value||'',
+      cedula:   document.getElementById(`pers-${idx}-cedula`)?.value||'',
+      cel:      document.getElementById(`pers-${idx}-cel`)?.value||'',
+      email:    document.getElementById(`pers-${idx}-email`)?.value||'',
+      tramite:  document.getElementById(`pers-${idx}-tramite`)?.value||'',
+    });
+  });
+
+  return {
+    timestamp:      new Date().toISOString(),
+    nombre:         v('nombre'),
+    cedula:         v('cedula'),
+    tipo_persona:   v('tipo-persona'),
+    actividad:      v('actividad'),
+    subramo:        v('subramo'),
+    estado_civil:   v('estado-civil'),
+    profesion:      v('profesion'),
+    tipo_cliente:   v('tipo-cliente'),
+    telefono:       v('telefono'),
+    celular:        v('celular'),
+    email:          v('email'),
+    provincia:      v('provincia-1'),
+    distrito:       v('distrito-1'),
+    corregimiento:  v('correg-1'),
+    direccion:      v('direccion-1'),
+    monto:          v('monto'),
+    plazo:          v('plazo'),
+    pagos_nombre:   v('pagos-nombre'),
+    pagos_cedula:   v('pagos-cedula'),
+    pagos_tel:      v('pagos-tel'),
+    pagos_cel:      v('pagos-cel'),
+    pagos_email:    v('pagos-email'),
+    ciudad_firma:   v('ciudad-firma'),
+    fecha_firma:    v('fecha-firma'),
+    puntos:         puntos,
+    personal:       personal,
+  };
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────
+async function submitForm() {
+  const data = collectData();
+  document.getElementById('spinner').classList.add('active');
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('submit-error').classList.remove('visible');
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    showSuccess(data);
+  } catch(err) {
+    document.getElementById('submit-error').classList.add('visible');
+    document.getElementById('btn-next').disabled = false;
+  } finally {
+    document.getElementById('spinner').classList.remove('active');
+  }
+}
+
+function showSuccess(data) {
+  document.getElementById('nav-row').style.display = 'none';
+  document.querySelectorAll('.section-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('success-screen').classList.add('active');
+  document.querySelectorAll('.step-item').forEach(el=>el.classList.add('done'));
+  document.getElementById('data-summary').innerHTML = `
+    <h3>Resumen de Solicitud</h3>
+    ${[
+      ['Nombre',         data.nombre],
+      ['Cédula / RUC',   data.cedula],
+      ['Tipo',           data.tipo_persona],
+      ['Actividad',      data.actividad],
+      ['Teléfono',       data.telefono],
+      ['Email',          data.email],
+      ['Monto Solicitado','USD '+Number(data.monto).toLocaleString('es-PA')],
+      ['Plazo',          data.plazo],
+      ['Ubicación',      data.provincia+(data.distrito?', '+data.distrito:'')],
+      ['Puntos de entrega', data.puntos.length],
+      ['Personal autorizado', data.personal.length],
+      ['Fecha',          data.fecha_firma],
+    ].map(([k,val])=>`<div class="sum-row"><span class="sum-key">${k}</span><span class="sum-val">${val||'—'}</span></div>`).join('')}
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+init();
+</script>
+</body>
+</html>
