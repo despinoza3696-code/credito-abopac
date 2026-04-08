@@ -497,11 +497,15 @@ function initFirma() {
   const ctx = canvas.getContext('2d');
   let drawing = false, lastX = 0, lastY = 0;
   function resize() {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width; canvas.height = rect.height || 180;
-    ctx.strokeStyle='#1a3a2a'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+    const w = canvas.offsetWidth;
+    if (w > 0) {
+      canvas.width = w;
+      canvas.height = canvas.offsetHeight || 180;
+      ctx.strokeStyle='#1a3a2a'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+    }
   }
-  resize(); window.addEventListener('resize', resize);
+  // Don't call resize() on init - canvas is hidden. Called from nextStep when visible.
+  window.addEventListener('resize', resize);
   function getPos(e) { const rect=canvas.getBoundingClientRect(), src=e.touches?e.touches[0]:e; return [src.clientX-rect.left, src.clientY-rect.top]; }
   function start(e) { e.preventDefault(); drawing=true; [lastX,lastY]=getPos(e); }
   function move(e) {
@@ -655,7 +659,7 @@ async function submitForm() {
   document.getElementById('btn-next').disabled=true;
   document.getElementById('submit-error').classList.remove('visible');
   try {
-    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(data)});
     showSuccess(data);
   } catch(err) {
     document.getElementById('submit-error').classList.add('visible');
