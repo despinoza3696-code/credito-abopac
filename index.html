@@ -605,6 +605,20 @@ function nextStep() {
   currentStep++;
   document.getElementById(`step-${currentStep}`).classList.add('active');
   updateNav(); window.scrollTo({top:0,behavior:'smooth'});
+  // Re-init firma canvas when step 4 (index 3) becomes visible
+  if (currentStep === 3) {
+    setTimeout(() => {
+      const canvas = document.getElementById('firma-canvas');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = rect.width || canvas.offsetWidth || 700;
+      canvas.height = rect.height || 180;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#1a3a2a';
+      ctx.lineWidth   = 2.5;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+    }, 100);
+  }
 }
 function prevStep() {
   document.getElementById(`step-${currentStep}`).classList.remove('active');
